@@ -8,6 +8,7 @@ mcp = FastMCP("WeatherAlerts")
 @mcp.tool()
 async def get_weather_alerts(state: str) -> str:
     """Fetch active weather alerts for a given US state (e.g., 'CA', 'NY')."""
+    state = state.strip()
     url = f"https://api.weather.gov/alerts/active/area/{state}"
     headers = {"User-Agent": "MCP-Server-Project (https://github.com/Rahii123/mcp)"}
     
