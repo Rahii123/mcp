@@ -8,4 +8,5 @@ dependencies = [
     "httpx>=0.28.1",
     "mcp[server]>=1.25.0",
     "nest-asyncio>=1.6.0",
+    "python-dotenv>=1.2.1",
 ]

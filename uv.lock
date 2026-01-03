@@ -278,6 +278,7 @@ dependencies = [
     { name = "httpx" },
     { name = "mcp" },
     { name = "nest-asyncio" },
+    { name = "python-dotenv" },
 ]
 
 [package.metadata]
@@ -285,6 +286,7 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "mcp", extras = ["server"], specifier = ">=1.25.0" },
     { name = "nest-asyncio", specifier = ">=1.6.0" },
+    { name = "python-dotenv", specifier = ">=1.2.1" },
 ]
 
 [[package]]
