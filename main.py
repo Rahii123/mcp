@@ -55,7 +55,8 @@ async def handle_sse(request):
     dynamic_sse = SseServerTransport(f"{scheme}://{host}/sse")
     
     async with dynamic_sse.connect_sse(request.scope, request.receive, request._send) as (read, write):
-        await mcp.server.handle_request(read, write)
+        # Access the private _mcp_server attribute of FastMCP
+        await mcp._mcp_server.handle_request(read, write)
 
 async def handle_messages(request):
     host = request.headers.get("host", "localhost")
