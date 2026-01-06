@@ -3,10 +3,12 @@ import httpx
 import os
 import uvicorn
 from dotenv import load_dotenv
+from starlette.applications import Starlette
+from starlette.routing import Route
 from starlette.responses import PlainTextResponse
-from starlette.middleware.base import BaseHTTPMiddleware
+import mcp.server.sse
 
-# Load environment variables
+# Load variables
 load_dotenv()
 
 # Initialize FastMCP
@@ -47,37 +49,27 @@ def list_directory(path: str = ".") -> str:
         return "\n".join([f"- {item}" for item in items]) if items else "Empty."
     except Exception as e: return str(e)
 
-# --- RAILWAY & NETWORKING FIX ---
-# 1. Create the App instance
-app = mcp.sse_app()
+# --- PRODUCTION-READY SSE HANDLER ---
+# This manual handler bypasses the strict Host validation that causes the 421 error
+async def handle_sse(request):
+    async with mcp.server.sse.connect_sse(
+        request.scope, request.receive, request._send
+    ) as (read_stream, write_stream):
+        await mcp.server.handle_request(read_stream, write_stream)
 
-# 2. Add The "Senior Engineer" Middleware Fix
-class HostFixMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request, call_next):
-        # This fixes the "421 Misdirected Request" by making the host header
-        # match what the MCP library expects from Railway.
-        if "x-forwarded-host" in request.headers:
-            host = request.headers["x-forwarded-host"]
-            new_headers = []
-            for name, value in request.scope["headers"]:
-                if name.lower() == b"host":
-                    new_headers.append((b"host", host.encode()))
-                else:
-                    new_headers.append((name, value))
-            request.scope["headers"] = new_headers
-        return await call_next(request)
-
-app.add_middleware(HostFixMiddleware)
-
-@app.route("/")
-async def homepage(request):
-    return PlainTextResponse("MCP_SERVER_IS_LIVE")
+# Create a standard Starlette app
+app = Starlette(
+    routes=[
+        Route("/", endpoint=lambda r: PlainTextResponse("MCP_SERVER_IS_LIVE")),
+        Route("/sse", endpoint=handle_sse, methods=["GET", "POST"])
+    ]
+)
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8080))
-    # If no PORT is set (local testing), use mcp.run()
-    if not os.getenv("PORT"):
-        mcp.run()
-    else:
-        # On Railway, use uvicorn with proxy settings
+    if os.getenv("PORT"):
+        # Trust Railway Proxy
         uvicorn.run(app, host="0.0.0.0", port=port, proxy_headers=True, forwarded_allow_ips="*")
+    else:
+        # Local Stdio
+        mcp.run()
