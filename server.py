@@ -75,24 +75,17 @@ def list_directory(path: str = ".") -> str:
     except Exception as e:
         return f"Error reading directory: {str(e)}"
 
-if __name__ == "__main__":
-    # Railway sets a PORT environment variable automatically
-    port = int(os.getenv("PORT", 8000))
-    
-    if os.getenv("PORT"):
-        # On Railway, we use uvicorn to run the internal sse_app
-        import uvicorn
-        from starlette.responses import PlainTextResponse
-        
-        # Add a root route for Railway health checks
-        app = mcp.sse_app
-        @app.route("/")
-        async def homepage(request):
-            return PlainTextResponse("MCP Server is running!")
+# Create the SSE application at the top level for Railway/Uvicorn
+app = mcp.sse_app
 
-        print(f"Starting SSE server on 0.0.0.0:{port}...")
-        uvicorn.run(app, host="0.0.0.0", port=port)
-    else:
-        # Default to stdio for local development
-        print("Starting local Stdio server...")
-        mcp.run()
+from starlette.responses import PlainTextResponse
+@app.route("/")
+async def homepage(request):
+    return PlainTextResponse("MCP Server is running!")
+
+if __name__ == "__main__":
+    # This block is used for local SSE testing if needed
+    import uvicorn
+    port = int(os.getenv("PORT", 8000))
+    print(f"Starting SSE server on 0.0.0.0:{port}...")
+    uvicorn.run(app, host="0.0.0.0", port=port)
