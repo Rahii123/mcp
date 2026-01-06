@@ -76,11 +76,14 @@ def list_directory(path: str = ".") -> str:
         return f"Error reading directory: {str(e)}"
 
 if __name__ == "__main__":
-    # Check if we should run in SSE mode (for deployment) or Stdio mode (for local)
     # Railway sets a PORT environment variable automatically
+    port = int(os.getenv("PORT", 8000))
+    
     if os.getenv("PORT"):
-        print(f"Starting SSE server on port {os.getenv('PORT')}...")
-        mcp.run(transport='sse')
+        print(f"Starting SSE server on 0.0.0.0:{port}...")
+        # Listening on 0.0.0.0 is required for most cloud providers like Railway
+        mcp.run(transport='sse', host="0.0.0.0", port=port)
     else:
         # Default to stdio for local development
+        print("Starting local Stdio server...")
         mcp.run(transport='stdio')
