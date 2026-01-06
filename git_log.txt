@@ -1,0 +1,29 @@
+commit c8e5419e2b21d82f001c722b2b6b04603d70fb2f
+Author: Your Name <you@example.com>
+Date:   Mon Jan 5 19:53:20 2026 -0800
+
+    Move all logic to main.py for Railway
+
+commit 7979e2047bfe9b9037ca576acb65b94d55abf747
+Author: Your Name <you@example.com>
+Date:   Mon Jan 5 19:49:20 2026 -0800
+
+    Expose app globally for Railway health checks
+
+commit 03239a3b543c166b131f3761bf22044b840e99ae
+Author: Your Name <you@example.com>
+Date:   Mon Jan 5 19:45:03 2026 -0800
+
+    Add health check for Railway
+
+commit b0a00450c2a871d3b896a1402ac9e45230912e40
+Author: Your Name <you@example.com>
+Date:   Mon Jan 5 19:30:59 2026 -0800
+
+    Fix SSE startup logic
+
+commit 7808485ce47245e9b8ea6477831c50d8e050a4fc
+Author: Your Name <you@example.com>
+Date:   Mon Jan 5 18:52:00 2026 -0800
+
+    Fix Railway host/port binding
