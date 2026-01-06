@@ -1,0 +1,1 @@
+['sse_app', 'streamable_http_app']
