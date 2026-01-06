@@ -51,7 +51,14 @@ if __name__ == "__main__":
     # If Railway provides a PORT, use it and run in SSE mode
     port = int(os.getenv("PORT", 8080))
     if os.getenv("PORT"):
-        uvicorn.run(app, host="0.0.0.0", port=port)
+        # Use proxy_headers=True to handle Railway's load balancer correctly
+        uvicorn.run(
+            app, 
+            host="0.0.0.0", 
+            port=port, 
+            proxy_headers=True, 
+            forwarded_allow_ips="*"
+        )
     else:
         # Default to local stdio mode
         mcp.run()
