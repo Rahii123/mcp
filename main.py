@@ -69,8 +69,8 @@ def list_directory(path: str = ".") -> str:
     except Exception as e:
         return f"Error: {str(e)}"
 
-# 4. Create the SSE app for Railway
-app = mcp.sse_app
+# 4. Create the SSE app for Railway (Calling the method to get the Starlette instance)
+app = mcp.sse_app()
 
 # 5. Add Health Check (Required for Railway)
 @app.route("/")
