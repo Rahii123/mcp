@@ -11,7 +11,7 @@ from mcp.server.transport_security import TransportSecuritySettings
 
 # --- VERSION TRACKING ---
 # Look for this in your Railway logs to confirm the NEW code is running
-VERSION = "FINAL_BULLETPROOF_V4"
+VERSION = "FINAL_BULLETPROOF_V5"
 print(f"--- STARTING MCP SERVER VERSION: {VERSION} ---")
 
 # Load environment variables
@@ -54,18 +54,23 @@ def list_directory(path: str = ".") -> str:
     except Exception as e: return str(e)
 
 # --- THE "BULLETPROOF" TRANSPORT FIX ---
-# We explicitly disable the security check that causes the 421/ValueError
+# Disable security check for proxy compatibility
 security_settings = TransportSecuritySettings(enable_dns_rebinding_protection=False)
-sse = SseServerTransport("/sse", security_settings=security_settings)
+# SseServerTransport needs a relative path for the message endpoint
+sse = SseServerTransport("/messages", security_settings=security_settings)
 
 async def handle_sse(request):
-    # Defensive attribute access: handle both old and new FastMCP versions
     internal_server = getattr(mcp, "_mcp_server", getattr(mcp, "server", None))
     if internal_server is None:
         raise AttributeError("Could not find the internal MCP server in FastMCP object")
     
     async with sse.connect_sse(request.scope, request.receive, request._send) as (read, write):
-        await internal_server.handle_request(read, write)
+        # NOTE: Use .run() with initialization options on the low-level server
+        await internal_server.run(
+            read, 
+            write, 
+            internal_server.create_initialization_options()
+        )
 
 async def handle_messages(request):
     await sse.handle_post_message(request.scope, request.receive, request._send)
@@ -75,8 +80,7 @@ app = Starlette(
     routes=[
         Route("/", endpoint=lambda r: PlainTextResponse(f"MCP_SERVER_IS_LIVE (Ver: {VERSION})")),
         Route("/sse", endpoint=handle_sse),
-        # Note: the message endpoint MUST match what SseServerTransport was initialized with
-        Route("/sse", endpoint=handle_messages, methods=["POST"]),
+        Route("/messages", endpoint=handle_messages, methods=["POST"]),
     ]
 )
 
