@@ -5,7 +5,7 @@ import uvicorn
 from dotenv import load_dotenv
 from starlette.applications import Starlette
 from starlette.responses import PlainTextResponse
-from starlette.routing import Route, Mount
+from starlette.routing import Route
 from mcp.server.sse import SseServerTransport
 
 # Load environment variables
@@ -39,20 +39,31 @@ async def search_news(query: str) -> str:
         articles = response.json().get("articles", [])
         return "\n".join([f"- {a.get('title')}" for a in articles]) or "No news found."
 
-# --- BULLETPROOF NETWORKING ---
-# We use the internal SSE handler but we disable the strict host check by overriding the transport
-sse = SseServerTransport("/sse")
+@mcp.tool()
+def list_directory(path: str = ".") -> str:
+    """List local directory contents."""
+    try:
+        items = os.listdir(path)
+        return "\n".join([f"- {item}" for item in items]) if items else "Empty."
+    except Exception as e: return str(e)
 
+# --- DYNAMIC TRANSPORT FIX ---
 async def handle_sse(request):
-    # This manually handles the SSE connection and bypasses FastMCP's internal validation
-    async with sse.connect_sse(request.scope, request.receive, request._send) as (read, write):
+    # Dynamically create transport based on incoming host to bypass validation
+    host = request.headers.get("host", "localhost")
+    scheme = request.headers.get("x-forwarded-proto", "https")
+    dynamic_sse = SseServerTransport(f"{scheme}://{host}/sse")
+    
+    async with dynamic_sse.connect_sse(request.scope, request.receive, request._send) as (read, write):
         await mcp.server.handle_request(read, write)
 
 async def handle_messages(request):
-    # This handles the POST messages from the client
-    await sse.handle_post_message(request.scope, request.receive, request._send)
+    host = request.headers.get("host", "localhost")
+    scheme = request.headers.get("x-forwarded-proto", "https")
+    dynamic_sse = SseServerTransport(f"{scheme}://{host}/sse")
+    await dynamic_sse.handle_post_message(request.scope, request.receive, request._send)
 
-# Create a clean Starlette app
+# --- STARLETTE APP ---
 app = Starlette(
     routes=[
         Route("/", endpoint=lambda r: PlainTextResponse("MCP_SERVER_IS_LIVE")),
