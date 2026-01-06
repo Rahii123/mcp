@@ -1,0 +1,24 @@
+git : To https://githu
+b.com/Rahii123/mcp.git
+At line:1 char:109
++ ...  and defensive 
+server access (V4)"; 
+git push origin main 
+2>&1 | Out-F ...
++                     
+                    ~~
+~~~~~~~~~~~~~~~~~~~~~~
+~
+    + CategoryInfo    
+          : NotSpeci  
+  fied: (To https:/   
+ /github.com/Rahii    
+123/mcp.git:Strin    
+g) [], RemoteExce    
+ption
+    + FullyQualifiedE 
+   rrorId : NativeCo  
+  mmandError
+ 
+   3c757fe..8f580bd  
+main -> main

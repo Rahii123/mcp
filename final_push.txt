@@ -1,0 +1,19 @@
+git : To https://github.com/R
+ahii123/mcp.git
+At line:1 char:77
++ ... ess _mcp_server 
+instead of server"; git push 
+origin main 2>&1 | Out-F ...
++                            
+             
+~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (To http  
+  s://github.com/Rahii123/   
+ mcp.git:String) [], Remo    
+teException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+   4b11d11..3c757fe  main -> 
+main
