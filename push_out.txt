@@ -1,0 +1,20 @@
+git : To https://github.com/R
+ahii123/mcp.git
+At line:1 char:83
++ ... anual SSE/POST 
+transport handling"; git 
+push origin main 2>&1 | 
+Out-F ...
++                            
+             
+~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (To http  
+  s://github.com/Rahii123/   
+ mcp.git:String) [], Remo    
+teException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+   c92e922..78895e1  main -> 
+main
