@@ -1,0 +1,19 @@
+git : To https://github.com/R
+ahii123/mcp.git
+At line:1 char:63
++ ... Compiling all updates 
+for Railway"; git push 
+origin main 2>&1 | Out-F ...
++                            
+             
+~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (To http  
+  s://github.com/Rahii123/   
+ mcp.git:String) [], Remo    
+teException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+   5c45dd2..2875447  main -> 
+main

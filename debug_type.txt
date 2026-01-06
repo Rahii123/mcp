@@ -1,0 +1,2 @@
+Type of sse_app: <class 'method'>
+Is callable: True

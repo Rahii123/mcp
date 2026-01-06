@@ -1,10 +1,9 @@
 import asyncio
+import httpx
 from mcp import ClientSession
 from mcp.client.sse import sse_client
 
 async def run_online_client():
-    # REPLACE THIS URL with your actual Railway deployment URL
-    # Example: "https://mcp-server-production-xxxx.up.railway.app/sse"
     url = input("Enter your deployed MCP Server URL (including /sse): ").strip()
     
     if not url.startswith("http"):
@@ -43,8 +42,12 @@ async def run_online_client():
                         print(f"\nResult:\n{result.content[0].text if result.content else 'Empty'}")
                     elif choice == '4' or choice.lower() == 'exit':
                         break
+    except httpx.HTTPStatusError as e:
+        print(f"\n❌ HTTP Error: {e.response.status_code} {e.response.reason_phrase}")
+        print(f"URL: {e.request.url}")
+        print("This usually means Railway is having trouble routing to your app.")
     except Exception as e:
-        print(f"Connection failed: {e}")
+        print(f"\n❌ Error: {e}")
 
 if __name__ == "__main__":
     asyncio.run(run_online_client())
