@@ -1,19 +1,20 @@
-import asyncio
+from mcp.server.fastmcp import FastMCP
 import httpx
 import os
 from dotenv import load_dotenv
-from mcp.server.fastmcp import FastMCP
 
-# Load environment variables from .env file
+# Load environment variables
 load_dotenv()
 
 # Initialize FastMCP server
+# Note: For Railway/Deployment, the server name/title is mainly for UI
 mcp = FastMCP("AdvancedWeatherNews")
 
 @mcp.tool()
 async def get_weather_alerts(state: str) -> str:
     """Fetch active weather alerts for a given US state (e.g., 'CA', 'NY')."""
-    state = state.strip()
+    # API requires uppercase state codes (e.g., 'CA' not 'ca')
+    state = state.strip().upper()
     url = f"https://api.weather.gov/alerts/active/area/{state}"
     headers = {"User-Agent": "MCP-Server-Project (https://github.com/Rahii123/mcp)"}
     
@@ -43,7 +44,6 @@ async def search_news(query: str) -> str:
     if not api_key or api_key.strip() == "your_api_key_here":
         return "Error: NEWS_API_KEY not set. Please add it to your .env file."
     
-    api_key = api_key.strip()
     url = f"https://newsapi.org/v2/everything?q={query}&pageSize=5&apiKey={api_key}"
     
     async with httpx.AsyncClient() as client:
@@ -75,10 +75,12 @@ def list_directory(path: str = ".") -> str:
     except Exception as e:
         return f"Error reading directory: {str(e)}"
 
-@mcp.resource("notes://general")
-def get_notes() -> str:
-    """A sample resource providing general information about the server."""
-    return "This MCP server provides weather alerts, news search, and local file exploration."
-
 if __name__ == "__main__":
-    mcp.run()
+    # Check if we should run in SSE mode (for deployment) or Stdio mode (for local)
+    # Railway sets a PORT environment variable automatically
+    if os.getenv("PORT"):
+        print(f"Starting SSE server on port {os.getenv('PORT')}...")
+        mcp.run(transport='sse')
+    else:
+        # Default to stdio for local development
+        mcp.run(transport='stdio')
