@@ -80,10 +80,11 @@ if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
     
     if os.getenv("PORT"):
+        # On Railway, we use uvicorn to run the internal sse_app
+        import uvicorn
         print(f"Starting SSE server on 0.0.0.0:{port}...")
-        # Listening on 0.0.0.0 is required for most cloud providers like Railway
-        mcp.run(transport='sse', host="0.0.0.0", port=port)
+        uvicorn.run(mcp.sse_app, host="0.0.0.0", port=port)
     else:
         # Default to stdio for local development
         print("Starting local Stdio server...")
-        mcp.run(transport='stdio')
+        mcp.run()
