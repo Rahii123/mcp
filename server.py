@@ -82,8 +82,16 @@ if __name__ == "__main__":
     if os.getenv("PORT"):
         # On Railway, we use uvicorn to run the internal sse_app
         import uvicorn
+        from starlette.responses import PlainTextResponse
+        
+        # Add a root route for Railway health checks
+        app = mcp.sse_app
+        @app.route("/")
+        async def homepage(request):
+            return PlainTextResponse("MCP Server is running!")
+
         print(f"Starting SSE server on 0.0.0.0:{port}...")
-        uvicorn.run(mcp.sse_app, host="0.0.0.0", port=port)
+        uvicorn.run(app, host="0.0.0.0", port=port)
     else:
         # Default to stdio for local development
         print("Starting local Stdio server...")
